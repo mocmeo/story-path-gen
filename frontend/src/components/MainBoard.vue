@@ -2,7 +2,14 @@
   <div class="main-board">
     <h1 class="title">Story:</h1>
     <div class="section-story">
-      <button class="btn-add" v-if="!isAdding" @click="toggleAdd">Add</button>
+      <button class="btn-back" @click="moveBackward">Back</button>
+      <button
+        v-if="!isAdding"
+        :class="['btn-add', { disabled: disabledAdd }]"
+        @click="toggleAdd"
+      >
+        Add
+      </button>
       <template v-else>
         <button class="btn-cancel" @click="toggleAdd">Cancel</button>
         <input type="text" @keyup.enter="enterText" v-model="textVal" />
@@ -25,6 +32,14 @@
         <tr>
           <th>Option (A,B,C)</th>
           <th>Role</th>
+        </tr>
+        <tr
+          v-for="option in records[index].options"
+          :key="option.id"
+          @click="moveForward(option.id)"
+        >
+          <td>{{ option.text }}</td>
+          <td>{{ option.role }}</td>
         </tr>
       </table>
     </div>
@@ -70,11 +85,7 @@ const selectedRole = ref<string>("girl");
 const selectedReply = ref<string>("normal");
 const index = ref<string>("-1");
 
-const lastLine = computed(() => {
-  const prevId = index.value;
-  return records[prevId].text;
-});
-
+// ------- COMPUTED VALUES ----------
 const indexAft = computed(() => {
   return records[index.value].next;
 });
@@ -86,22 +97,53 @@ const currentLine = computed(() => {
   return {};
 });
 
-const toggleAdd = () => {
-  isAdding.value = !isAdding.value;
-};
+const lastLine = computed(() => {
+  const prevId = index.value;
+  return records[prevId].text;
+});
 
+const disabledAdd = computed(() => {
+  // alrdy added reply
+  if (!isEmpty(currentLine.value)) {
+    return true;
+  }
+  if (selectedRole.value !== "girl" && selectedReply.value === "decision") {
+    return true;
+  }
+  return false;
+});
+
+// ------- FUNCTIONS -------------
 const moveForward = (nodeId: string) => {
   index.value = nodeId;
 };
 
-const enterText = () => {
-  const nowId = nanoid();
-  const prevId = index.value;
+const moveBackward = () => {
+  if (index.value === "-1") return;
+  index.value = records[index.value].prev;
+};
 
-  records[prevId] = {
-    ...records[prevId],
-    next: nowId,
-  };
+const toggleAdd = () => {
+  if (disabledAdd.value) return;
+  isAdding.value = !isAdding.value;
+};
+
+const enterText = () => {
+  const prevId = index.value;
+  const nowId = nanoid();
+
+  if (selectedReply.value === "normal") {
+    enterNormalReply(prevId, nowId);
+  } else {
+    enterOptions(prevId, nowId);
+  }
+
+  textVal.value = "";
+  isAdding.value = !isAdding.value;
+};
+
+const enterNormalReply = (prevId: string, nowId: string) => {
+  records[prevId].next = nowId;
   records[nowId] = {
     id: nowId,
     role: selectedRole.value,
@@ -110,9 +152,20 @@ const enterText = () => {
     next: null,
     options: [],
   };
+};
 
-  textVal.value = "";
-  isAdding.value = !isAdding.value;
+const enterOptions = (prevId: string, nowId: string) => {
+  const newRecord = {
+    id: nowId,
+    role: selectedRole.value,
+    text: textVal.value,
+    prev: prevId,
+    next: null,
+    options: [],
+  };
+
+  records[prevId].options.push(newRecord);
+  records[nowId] = newRecord;
 };
 </script>
 
@@ -138,6 +191,15 @@ const enterText = () => {
       padding: 0.08rem 0.15rem;
       background: #1976d2;
       margin-bottom: 0.1rem;
+
+      &.disabled {
+        filter: grayscale(1);
+      }
+    }
+
+    .btn-back {
+      @extend .btn-add;
+      @include position(absolute, $top: 0.7rem, $left: 10.9rem);
     }
 
     .btn-cancel {
