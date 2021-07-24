@@ -1,0 +1,28 @@
+@keyframes blink {
+  0% {
+    background: #b5374cb6;
+  }
+  100% {
+    background: #f9002a;
+  }
+}
+
+@keyframes balloon-pulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes moveUp {
+  100% {
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+  0% {
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0, -0.1rem, 0);
+  }
+}
