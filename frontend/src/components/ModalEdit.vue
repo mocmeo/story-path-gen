@@ -14,6 +14,7 @@
           class="input"
           placeholder="Enter"
           v-model:value="record.text"
+          @keyup.enter="$emit('close')"
         />
       </div>
 

@@ -5,14 +5,15 @@
       <a-button class="btn-back" type="primary" @click="moveBackward">
         Back
       </a-button>
-      <a-button
-        type="primary"
-        v-if="!isAdding"
-        :disabled="disabledAdd"
-        @click="toggleAdd"
-      >
-        Add
-      </a-button>
+
+      <div class="panel-adder" v-if="!isAdding">
+        <a-button type="primary" :disabled="disabledAdd" @click="toggleAdd">
+          Add
+        </a-button>
+        <a-button type="dashed" v-if="!isAdding" :disabled="disabledAdd">
+          Add old
+        </a-button>
+      </div>
 
       <template v-else>
         <a-button class="btn-cancel" @click="toggleAdd">Cancel</a-button>
@@ -257,6 +258,14 @@ const closeEditModal = () => {
     @include flexCenter(column);
     position: relative;
     align-items: flex-start;
+
+    .panel-adder {
+      @include flexCenter(row);
+
+      button {
+        margin-right: 0.1rem;
+      }
+    }
 
     .btn-back {
       @include position(absolute, $top: 0rem, $right: 0);
