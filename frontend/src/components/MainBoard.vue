@@ -10,7 +10,12 @@
         <a-button type="primary" :disabled="disabledAdd" @click="toggleAdd">
           Add
         </a-button>
-        <a-button type="dashed" v-if="!isAdding" :disabled="disabledAdd">
+        <a-button
+          type="dashed"
+          v-if="!isAdding"
+          :disabled="disabledAdd || disabledAddOld"
+          @click="showAddOldModal"
+        >
           Add old
         </a-button>
       </div>
@@ -96,6 +101,14 @@
       :record="selectedRecord"
       @close="closeEditModal"
     />
+
+    <ModalAddOld
+      v-if="showAddOld"
+      @close="closeAddOldModal"
+      @confirm="confirmAddOld"
+      :recordId="index"
+      :allRecords="records"
+    />
   </div>
 </template>
 
@@ -104,6 +117,7 @@ import { computed, ref, reactive } from "vue";
 import { nanoid } from "nanoid";
 import { EditOutlined, CloseOutlined } from "@ant-design/icons-vue";
 import ModalEdit from "./ModalEdit.vue";
+import ModalAddOld from "./ModalAddOld.vue";
 import isEmpty from "lodash/isEmpty";
 
 const records = reactive<Record<string, any>>({
@@ -119,18 +133,21 @@ const records = reactive<Record<string, any>>({
 
 const visible = ref<boolean>(false);
 const roles = ["prompt", "scene", "girl", "jenny", "joshua"];
+const emos = ["happy", "neutral", "sad"];
 const isAdding = ref<boolean>(false);
 const textVal = ref<string>("");
 const selectedRole = ref<string>("girl");
 const selectedReply = ref<string>("normal");
+const selectedEmo = ref<string>("happy");
 const index = ref<string>("-1");
 
 const selectedRecord = ref<Record<string, any>>({});
 const showEdit = ref<boolean>(false);
+const showAddOld = ref<boolean>(false);
 
 // ------- COMPUTED VALUES ----------
 const indexAft = computed(() => {
-  return records[index.value].next;
+  return records[index.value]?.next || {};
 });
 
 const currentLine = computed(() => {
@@ -142,7 +159,7 @@ const currentLine = computed(() => {
 
 const lastLine = computed(() => {
   const prevId = index.value;
-  return records[prevId].text;
+  return records[prevId]?.text || "";
 });
 
 const disabledAdd = computed(() => {
@@ -156,6 +173,10 @@ const disabledAdd = computed(() => {
   return false;
 });
 
+const disabledAddOld = computed(() => {
+  if (selectedReply.value === "decision") return true;
+});
+
 // ------- FUNCTIONS -------------
 const moveForward = (nodeId: string) => {
   index.value = nodeId;
@@ -163,7 +184,10 @@ const moveForward = (nodeId: string) => {
 
 const moveBackward = () => {
   if (index.value === "-1") return;
-  index.value = records[index.value].prev;
+  const prevId = records[index.value].prev;
+  if (prevId) {
+    index.value = prevId;
+  }
 };
 
 const toggleAdd = () => {
@@ -231,6 +255,26 @@ const clearNode = (nodeId: string) => {
   }
 };
 
+const showAddOldModal = () => {
+  showAddOld.value = true;
+};
+
+const closeAddOldModal = () => {
+  showAddOld.value = false;
+};
+
+const confirmAddOld = (chosenId: string) => {
+  const prevId = index.value;
+  const nowId = chosenId;
+
+  records[prevId].next = nowId;
+  records[nowId] = {
+    ...records[nowId],
+    prev: prevId,
+  };
+  closeAddOldModal();
+};
+
 const showEditModal = (record: any) => {
   selectedRecord.value = record;
   showEdit.value = true;
@@ -238,7 +282,6 @@ const showEditModal = (record: any) => {
 
 const closeEditModal = () => {
   showEdit.value = false;
-  console.log(records);
 };
 </script>
 
@@ -295,6 +338,7 @@ const closeEditModal = () => {
         }
         &:nth-child(2) {
           width: 15%;
+          text-transform: capitalize;
         }
         &:nth-child(3) {
           width: 10%;

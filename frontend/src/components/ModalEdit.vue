@@ -29,7 +29,7 @@
 import { defineProps } from "@vue/runtime-core";
 
 const props = defineProps<{
-  record: Record<string, any>;
+  record: Object;
 }>();
 </script>
 
@@ -42,7 +42,7 @@ const props = defineProps<{
   font-size: 0.36rem;
 
   .dialog {
-    @include sizeWH(6rem, 1.7rem);
+    @include sizeWH(700px, 210px);
     border-radius: 0.03rem;
     background: #fff;
     position: relative;
