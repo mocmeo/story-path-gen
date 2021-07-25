@@ -1,4 +1,4 @@
-export interface Narrative {
+export interface ChatRecord {
   [key: string]: {
     id: string;
     role: string;

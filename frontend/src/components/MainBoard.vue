@@ -1,6 +1,6 @@
 <template>
   <div class="main-board">
-    <h1 class="title">Story:</h1>
+    <h1 class="title">Storylines:</h1>
     <div class="section-story">
       <a-button class="btn-back" type="primary" @click="moveBackward">
         Back
@@ -38,8 +38,8 @@
             </td>
             <td>{{ currentLine.role }}</td>
             <td>
-              <EditOutlined @click="showEditModal" />
-              <DeleteOutlined @click="clearNode(currentLine.id)" />
+              <EditOutlined @click="showEditModal(currentLine)" />
+              <CloseOutlined @click="clearNode(currentLine.id)" />
             </td>
           </tr>
         </template>
@@ -54,8 +54,8 @@
           <td @click="moveForward(option.id)">{{ option.text }}</td>
           <td>{{ option.role }}</td>
           <td>
-            <EditOutlined @click="showEditModal" />
-            <DeleteOutlined @click="clearNode(option.id)" />
+            <EditOutlined @click="showEditModal(option)" />
+            <CloseOutlined @click="clearNode(option.id)" />
           </td>
         </tr>
       </table>
@@ -89,13 +89,20 @@
         </a-select>
       </div>
     </div>
+
+    <ModalEdit
+      v-if="showEdit"
+      :record="selectedRecord"
+      @close="closeEditModal"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, reactive } from "vue";
 import { nanoid } from "nanoid";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import { EditOutlined, CloseOutlined } from "@ant-design/icons-vue";
+import ModalEdit from "./ModalEdit.vue";
 import isEmpty from "lodash/isEmpty";
 
 const records = reactive<Record<string, any>>({
@@ -116,6 +123,9 @@ const textVal = ref<string>("");
 const selectedRole = ref<string>("girl");
 const selectedReply = ref<string>("normal");
 const index = ref<string>("-1");
+
+const selectedRecord = ref<Record<string, any>>({});
+const showEdit = ref<boolean>(false);
 
 // ------- COMPUTED VALUES ----------
 const indexAft = computed(() => {
@@ -220,11 +230,15 @@ const clearNode = (nodeId: string) => {
   }
 };
 
-const showEditModal = () => {
-  visible.value = true;
+const showEditModal = (record: any) => {
+  selectedRecord.value = record;
+  showEdit.value = true;
 };
 
-const handleEdit = (e: any) => {};
+const closeEditModal = () => {
+  showEdit.value = false;
+  console.log(records);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -235,7 +249,7 @@ const handleEdit = (e: any) => {};
   text-align: left;
 
   .title {
-    @include textMixin(#212121, 40px, bold);
+    @include textMixin(#212121, 32px, bold);
     margin-bottom: 0.1rem;
   }
 
@@ -264,7 +278,7 @@ const handleEdit = (e: any) => {};
       td,
       th {
         border-right: #f0f0f0 solid 0.01rem;
-        height: 0.3rem;
+        height: 40px;
         padding: 0 0.1rem;
 
         &:first-child {
