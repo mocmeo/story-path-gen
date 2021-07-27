@@ -5,6 +5,8 @@
     <PanelRole />
     <PanelReply />
     <PanelEmo />
+
+    <SectionExtra />
   </div>
 </template>
 
@@ -15,6 +17,7 @@ import PanelRole from "./PanelRole.vue";
 import PanelReply from "./PanelReply.vue";
 import PanelEmo from "./PanelEmo.vue";
 import SectionStory from "./SectionStory.vue";
+import SectionExtra from "./SectionExtra.vue";
 </script>
 
 <style lang="scss" scoped>
