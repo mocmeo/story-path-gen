@@ -30,32 +30,38 @@
       </div>
 
       <div class="footer">
-        <a-button type="primary" @click="confirmSelect"> Confirm </a-button>
+        <a-button type="primary" @click="$emit('confirm', selectedId)">
+          Confirm
+        </a-button>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { computed, defineEmit, defineProps, ref } from "@vue/runtime-core";
+<script lang="ts">
+import { computed, defineComponent, ref } from "vue";
 
-const emit = defineEmit(["confirm", "close"]);
+export default defineComponent({
+  props: {
+    recordId: { type: String, required: true },
+    allRecords: { type: Object, required: true },
+  },
 
-const props = defineProps({
-  recordId: { type: String, required: true },
-  allRecords: { type: Object, required: true },
+  setup(props) {
+    const selectedId = ref<string>("-1");
+
+    const recordIds = computed(() => {
+      return Object.keys(props.allRecords).filter(
+        (recordId) => recordId !== props.recordId && recordId !== "-1"
+      );
+    });
+
+    return {
+      recordIds,
+      selectedId,
+    };
+  },
 });
-
-const recordIds = computed(() => {
-  return Object.keys(props.allRecords).filter(
-    (recordId) => recordId !== props.recordId && recordId !== "-1"
-  );
-});
-
-const selectedId = ref<string>("-1");
-const confirmSelect = () => {
-  emit("confirm", selectedId.value);
-};
 </script>
 
 <style lang="scss" scoped>

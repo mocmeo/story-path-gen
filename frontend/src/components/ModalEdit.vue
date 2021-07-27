@@ -25,12 +25,14 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { defineProps } from "@vue/runtime-core";
+<script lang="ts">
+import { defineComponent } from "vue";
 
-const props = defineProps<{
-  record: Object;
-}>();
+export default defineComponent({
+  props: {
+    record: Object,
+  },
+});
 </script>
 
 <style lang="scss" scoped>
@@ -42,7 +44,7 @@ const props = defineProps<{
   font-size: 0.36rem;
 
   .dialog {
-    @include sizeWH(700px, 210px);
+    @include sizeWH(700px, 220px);
     border-radius: 0.03rem;
     background: #fff;
     position: relative;
