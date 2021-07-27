@@ -261,7 +261,7 @@ const closeEditModal = () => {
   }
 
   .btn-back {
-    @include position(absolute, $top: 0.1rem, $right: 0);
+    @include position(absolute, $top: 0.5rem, $right: 0);
   }
 
   .btn-cancel {

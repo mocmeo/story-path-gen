@@ -1,8 +1,11 @@
 <template>
   <div class="section-extra">
     <h1 class="title">Extra</h1>
+    <input type="file" id="selectFiles" />
     <div class="buttons">
-      <a-button class="btn-import" type="default">Import</a-button>
+      <a-button class="btn-import" type="default" @click="importFile">
+        Import
+      </a-button>
       <a-button class="btn-export" type="primary" @click="exportFile">
         Export
       </a-button>
@@ -15,7 +18,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, ref } from "vue";
 import useRecord from "../composables/useRecord";
 import ModalViewAll from "./ModalViewAll.vue";
@@ -29,7 +32,22 @@ export default defineComponent({
 
   setup() {
     const { records } = useRecord();
-    const canView = ref<boolean>(false);
+    const canView = ref(false);
+
+    const importFile = () => {
+      const files = document.getElementById("selectFiles").files;
+      if (files.length <= 0) return;
+      const fr = new FileReader();
+
+      fr.onload = function (e) {
+        var result = JSON.parse(e.target.result);
+        Object.keys(result).forEach((recordId) => {
+          records[recordId] = result[recordId];
+        });
+      };
+
+      fr.readAsText(files.item(0));
+    };
 
     const exportFile = () => {
       let text = JSON.stringify(records);
@@ -51,6 +69,7 @@ export default defineComponent({
     };
 
     return {
+      importFile,
       exportFile,
       canView,
       showViewModal,
@@ -65,10 +84,15 @@ export default defineComponent({
 
   .title {
     font-weight: bold;
+    margin-bottom: -10px;
   }
-  .buttons {
-    margin-top: -20px;
 
+  input {
+    font-size: 14px;
+    font-weight: normal;
+  }
+
+  .buttons {
     button {
       margin-right: 10px;
     }
