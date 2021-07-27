@@ -140,8 +140,18 @@ const disabledAddOld = computed(() => {
 });
 
 // ------- FUNCTIONS -------------
+const displayReplyMode = () => {
+  const options = records[index.value].options;
+  if (options.length > 0) {
+    selectedReply.value = "decision";
+  } else {
+    selectedReply.value = "normal";
+  }
+};
+
 const moveForward = (nodeId: string) => {
   index.value = nodeId;
+  displayReplyMode();
 };
 
 const moveBackward = () => {
@@ -149,6 +159,7 @@ const moveBackward = () => {
   const prevId = records[index.value].prev;
   if (prevId) {
     index.value = prevId;
+    displayReplyMode();
   }
 };
 
