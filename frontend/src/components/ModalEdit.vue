@@ -30,7 +30,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    record: Object,
+    record: { type: Object, required: true },
   },
 });
 </script>
