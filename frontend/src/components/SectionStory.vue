@@ -2,7 +2,12 @@
   <div class="section-story">
     <h1 class="title">Storylines:</h1>
 
-    <a-button class="btn-back" type="primary" @click="moveBackward">
+    <a-button
+      class="btn-back"
+      type="primary"
+      :disabled="isAdding"
+      @click="moveBackward"
+    >
       Back
     </a-button>
 
@@ -17,6 +22,13 @@
         @click="showAddOldModal"
       >
         Add old
+      </a-button>
+      <a-button
+        type="danger"
+        :disabled="disabledOverride"
+        @click="toggleOverride"
+      >
+        Override
       </a-button>
     </div>
 
@@ -135,6 +147,13 @@ const disabledAdd = computed(() => {
   return false;
 });
 
+const disabledOverride = computed(() => {
+  if (selectedRole.value !== "girl" && selectedReply.value === "decision") {
+    return true;
+  }
+  return false;
+});
+
 const disabledAddOld = computed(() => {
   if (selectedReply.value === "decision") return true;
 });
@@ -165,6 +184,11 @@ const moveBackward = () => {
 
 const toggleAdd = () => {
   if (disabledAdd.value) return;
+  isAdding.value = !isAdding.value;
+};
+
+const toggleOverride = () => {
+  if (disabledOverride.value) return;
   isAdding.value = !isAdding.value;
 };
 
